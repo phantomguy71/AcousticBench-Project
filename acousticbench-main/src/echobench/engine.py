@@ -149,9 +149,9 @@ def _score(store: Store, run: dict, root: Path) -> tuple[dict, Path]:
 
 def _want_target(clip: Clip, task: str):
     if task == "t60":
-        return clip.target_t60 if clip.target_t60 is not None else clip.target
+        return clip.target_t60
     if task == "distance":
-        return clip.target_distance if clip.target_distance is not None else clip.target
+         return clip.target_distance
     return clip.target
 
 
