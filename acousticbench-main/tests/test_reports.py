@@ -23,9 +23,9 @@ def test_compare_and_golden_text():
     comp = compare_pair(sim, real)
     assert comp["gap_definition"].startswith("gap")
     text = compare_markdown(comp, sim, real)
-    assert "# EchoBench sim-to-real comparison" in text
+    assert "# AcousticBench sim-to-real comparison" in text
     assert "Bootstrap" in text
-    assert run_markdown(sim).startswith("# EchoBench run report")
+    assert run_markdown(sim).startswith("# AcousticBench run report")
 
 
 def test_leaderboard_and_regressions():
