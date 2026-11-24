@@ -80,9 +80,5 @@ def _decode(blob: bytes, width: int, path: Path) -> np.ndarray:
         vals = np.where(vals >= 2**23, vals - 2**24, vals)
         return vals.astype(np.float64) / float(2**23)
     if width == 4:
-        as_f32 = np.frombuffer(blob, dtype="<f4")
-        ok = as_f32[np.isfinite(as_f32)]
-        if ok.size and float(np.percentile(np.abs(ok), 95)) <= 2.5:
-            return as_f32.astype(np.float64)
         return np.frombuffer(blob, dtype="<i4").astype(np.float64) / float(2**31)
     raise ValueError(f"{path}: {width * 8}-bit WAV is not supported (use 8/16/24/32-bit)")
