@@ -9,7 +9,7 @@ from pathlib import Path
 
 from echobench.audio_io import SUPPORTED_SUFFIXES
 
-ALIASES = {"t60": "target", "reference": "target", "distance": "target", "room": "tag"}
+ALIASES = {"reference": "target", "room": "tag"}
 
 
 @dataclass
@@ -83,14 +83,10 @@ def _from_manifest(root: Path) -> list[Clip]:
                 alt = root / Path(rel).name
                 cand = alt if alt.is_file() else cand
             tag = cols.get("label") or cols.get("tag") or ""
-            tgt = _num(cols.get("target") or cols.get("t60") or cols.get("value"))
-            tgt_t60 = _num(cols.get("target_t60") or cols.get("t60_s") or cols.get("t60_seconds"))
+            tgt = _num(cols.get("target") or cols.get("value"))
+            tgt_t60 = _num(cols.get("target_t60") or cols.get("t60_s") or cols.get("t60_seconds") or cols.get("t60"))
             tgt_dist = _num(cols.get("target_distance") or cols.get("distance_m") or cols.get("distance"))
-            # Fall back to the generic target when only one numeric column exists.
-            if tgt_t60 is None:
-                tgt_t60 = tgt
-            if tgt_dist is None:
-                tgt_dist = tgt
+
             group = cols.get("condition") or cols.get("room") or None
             split = (cols.get("split") or None) or None
             domain = (cols.get("domain") or None) or None
