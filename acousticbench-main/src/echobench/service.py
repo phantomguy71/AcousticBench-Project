@@ -25,8 +25,8 @@ def clean_config(raw: dict | None) -> dict:
     split = str(raw.get("split") or "all").strip().lower()
     if split in {"valid", "validation"}:
         split = "val"
-    if split not in {"all", "train", "val", "test"}:
-        raise ValueError("split must be all, train, val, or test.")
+    if split not in {"all", "train", "val", "test", "dev", "corpus"}:
+        raise ValueError("split must be all, train, val, test, dev, or corpus.")
     cap = raw.get("max_items")
     cap = None if cap in ("", None) else int(cap)
     if cap is not None and cap < 1:
