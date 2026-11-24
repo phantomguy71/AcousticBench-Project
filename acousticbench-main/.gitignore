@@ -1,0 +1,17 @@
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+*.egg-info/
+dist/
+build/
+.env
+data/runs/
+data/*.db
+data/*.db-*
+data/examples/
+data/ace/
+data/synth-rooms/
+.DS_Store
+Thumbs.db
