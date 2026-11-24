@@ -5,6 +5,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY src ./src
 COPY config ./config
 COPY examples ./examples
+COPY user_models ./user_models
 COPY pyproject.toml README.md ./
 RUN pip install --no-cache-dir .
 EXPOSE 8000
