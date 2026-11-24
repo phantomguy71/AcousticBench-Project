@@ -1,0 +1,8 @@
+# Use this file as an example. Copy it and edit the copy.
+sample_rate: 16000
+split: all
+max_items: null
+max_seconds: 30
+seed: 21
+event_tolerance_s: 0.25
+notes: "Example run config. Replace this note with the question this run answers."

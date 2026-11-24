@@ -1,0 +1,6 @@
+# Copy this file and point it at a real folder. One mapping per dataset.
+# name: "Lobby recordings"
+# domain: real            # simulated | real
+# layout: csv             # class_folders | csv
+# root_path: "D:/recordings/lobby"
+# description: "Who recorded it, which sensor, who labeled it, which split is for eval."
