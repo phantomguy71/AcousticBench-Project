@@ -10,5 +10,6 @@ COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 COPY src ./src
 COPY user_models ./user_models
+COPY pyproject.toml README.md ./
 RUN pip install --no-cache-dir .
 CMD ["echobench", "runs"]
