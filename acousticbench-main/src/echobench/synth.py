@@ -169,11 +169,11 @@ def _at(dims, frac) -> tuple[float, float, float]:
 
 
 def _pra_rir(pra, dims, alpha, src, mic):  # noqa: ANN001
-    room = pra.ShoeBox(list(dims), fs=RATE, absorption=alpha, max_order=40, air_absorption=False)
+    room = pra.ShoeBox(list(dims), fs=RATE, materials=pra.Material(alpha), max_order=40, air_absorption=False)
     room.add_source(list(src))
     room.add_microphone(list(mic))
     room.image_source_model()
-    room.simulate()
+    room.compute_rir()
     rir = np.asarray(room.rir[0][0], dtype=np.float64).ravel()
     want = int(ROOM_SECONDS * RATE)
     if rir.size < want:
