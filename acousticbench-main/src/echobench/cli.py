@@ -1,4 +1,4 @@
-"""Command line for EchoBench."""
+"""Shell entry for AcousticBench."""
 
 from __future__ import annotations
 
@@ -15,8 +15,8 @@ from echobench.demo import run_demo
 from echobench.engine import run_one
 from echobench.paths import db_file, ensure_importable, find_root
 from echobench.reporting import compare_markdown, leaderboard_rows, regression_alerts, run_markdown
-from echobench.service import inventory, queue_eval, register_dataset, register_model
 from echobench.storage import Store
+from echobench.service import inventory, queue_eval, register_dataset, register_model
 
 
 def main(argv: list[str] | None = None) -> None:
@@ -25,7 +25,7 @@ def main(argv: list[str] | None = None) -> None:
     except Exception:
         pass
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
-    ap = argparse.ArgumentParser(prog="echobench", description="Reproducible sim-to-real audio benchmark.")
+    ap = argparse.ArgumentParser(prog="echobench", description="Local harness for room-sound model tests.")
     ap.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
     ap.add_argument("--root", type=Path, help="Project root (default: auto-detect).")
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -116,7 +116,7 @@ def _serve(args) -> None:
 
     root = _root(args)
     ensure_importable(root)
-    print(f"EchoBench at http://{args.host}:{args.port}")
+    print(f"AcousticBench at http://{args.host}:{args.port}")
     uvicorn.run(build_app(root), host=args.host, port=args.port)
 
 
