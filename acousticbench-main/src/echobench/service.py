@@ -42,7 +42,9 @@ def clean_config(raw: dict | None) -> dict:
         raise ValueError("model_params must be a mapping.")
     tol = float(raw.get("event_tolerance_s") or 0.25)
     docker_image = str(raw.get("docker_image") or "").strip()
-    isolation = "docker" if docker_image else "direct"
+    if docker_image:
+        raise ValueError("Docker model isolation is not implemented; omit --docker-image.")
+    isolation = "direct"
     return {
         "sample_rate": rate, "split": split, "max_items": cap, "max_seconds": secs,
         "seed": seed, "notes": str(raw.get("notes") or "").strip(), "model_params": params,
