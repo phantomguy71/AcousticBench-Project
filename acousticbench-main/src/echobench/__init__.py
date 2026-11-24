@@ -1,4 +1,4 @@
-"""EchoBench: reproducible sim-to-real benchmark for room-acoustic models."""
+"""AcousticBench: run room-sound models on synthetic and measured clips and keep every result."""
 
 from __future__ import annotations
 
