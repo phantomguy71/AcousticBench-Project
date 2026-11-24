@@ -3,5 +3,4 @@
 #   - id: my-rir-net
 #     name: "My RIR network"
 #     qualified_name: "user_models.my_model:MyModel"
-#     description: "Checkpoint trained by our team."
 #     params: {}
