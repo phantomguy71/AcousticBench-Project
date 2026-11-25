@@ -3,37 +3,29 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AcousticBench Studio</title>
+<title>Acoustibcench</title>
 <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
-<div class="shell">
-<aside class="rail">
-  <div class="brand">
-    <p class="team">Williams · Tijero — Senior Project</p>
-    <h1>AcousticBench <span>Studio</span></h1>
-    <p class="sub">Test room-sound models on synthetic + measured clips.</p>
+<header class="top">
+  <div>
+    <p class="eyebrow">Malik Williams · Isaiah Tijero · Senior design</p>
+    <h1>Acoustibcench</h1>
+    <p class="tag">Reproducible sim-to-real benchmark for room-acoustic models</p>
   </div>
-  <nav aria-label="Sections">
-    <button data-view="overview" class="rail-btn">Home</button>
-    <button data-view="datasets" class="rail-btn">Sound Sets</button>
-    <button data-view="evaluate" class="rail-btn">New Test</button>
-    <button data-view="runs" class="rail-btn">Past Runs</button>
-    <button data-view="compare" class="rail-btn">Side by Side</button>
-    <button data-view="board" class="rail-btn">Standings</button>
+  <nav>
+    <button data-view="overview">Overview</button>
+    <button data-view="datasets">Datasets</button>
+    <button data-view="evaluate">Evaluate</button>
+    <button data-view="runs">Runs</button>
+    <button data-view="compare">Compare</button>
+    <button data-view="board">Leaderboard</button>
   </nav>
-  <div class="rail-foot">
-    <p>Malik Williams · Isaiah Tijero</p>
-    <p>Advisor: Dr. Sambit Bhattacharya</p>
-  </div>
-</aside>
-<div class="stage">
-  <p class="notice">Practice audio only — scores here prove the setup works, not a research result.</p>
-  <p class="flash" id="flash" role="status"></p>
-  <main id="main"><p class="muted">Warming up…</p></main>
-  <footer><p>AcousticBench Studio · local harness · CSC 490-D1</p></footer>
-</div>
-</div>
+</header>
+<p class="caveat">Demo audio is synthetic. Scores on it prove the harness runs; they are not study results.</p>
+<p class="flash" id="flash" role="status"></p>
+<main id="main"><p class="muted">Loading…</p></main>
+<footer><p>Team Malik Williams, Isaiah Tijero · Advisor Dr. Sambit Bhattacharya</p></footer>
 <script src="/static/app.js"></script>
 </body>
 </html>
