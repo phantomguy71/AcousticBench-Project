@@ -46,67 +46,67 @@ const opt = (v, t) => `<option value="${esc(v)}">${esc(t)}</option>`;
 function vOverview() {
   const o = S.overview || {};
   return `<div class="grid">
-    <div class="card"><p class="muted">Datasets</p><p class="stat">${o.datasets ?? 0}</p></div>
+    <div class="card"><p class="muted">Sound sets</p><p class="stat">${o.datasets ?? 0}</p></div>
     <div class="card"><p class="muted">Models</p><p class="stat">${o.models ?? 0}</p></div>
-    <div class="card"><p class="muted">Runs</p><p class="stat">${o.runs ?? 0}</p></div>
+    <div class="card"><p class="muted">Past runs</p><p class="stat">${o.runs ?? 0}</p></div>
     <div class="card"><p class="muted">Tasks</p><p>${esc(o.tasks || "")}</p></div></div>
-    <div class="panel"><h2>Workflow</h2>
-    <p>Register a simulated set and a real set, score one model on each, then compare. Every run keeps config, predictions, and provenance.</p>
+    <div class="panel"><h2>How a test flows</h2>
+    <p>Pick one synthetic set and one measured set, run the same model on both, then open Side by Side. Each entry keeps its settings, clip outputs, and machine notes.</p>
     <p class="muted">${esc(o.gap || "")}</p>
-    <div><button class="primary" data-action="nav-evaluate">Start an evaluation</button>
-    <button data-action="gen">Build demo sets</button>
-    <button data-action="rooms">Build synth rooms</button></div></div>
-    <div class="panel"><h2>Regressions</h2><pre>${esc(JSON.stringify(o.regressions || [], null, 2))}</pre></div>`;
+    <div><button class="primary" data-action="nav-evaluate">Start a new test</button>
+    <button data-action="gen">Make practice sets</button>
+    <button data-action="rooms">Make synthetic rooms</button></div></div>
+    <div class="panel"><h2>Recent slips</h2><pre>${esc(JSON.stringify(o.regressions || [], null, 2))}</pre></div>`;
 }
 function dsTable(rows) {
-  if (!rows.length) return `<p class="muted">None yet. Build the demo sets first.</p>`;
-  return `<table><tr><th>ID</th><th>Domain</th><th>Items</th><th>Name</th></tr>${rows.map((d) => `<tr><td>${esc(d.id)}</td><td>${esc(d.domain)}</td><td>${esc(d.inventory?.n_items ?? "?")}</td><td>${esc(d.name)}</td></tr>`).join("")}</table>`;
+  if (!rows.length) return `<p class="muted">Nothing here yet. Make the practice sets first.</p>`;
+  return `<table><tr><th>ID</th><th>Kind</th><th>Clips</th><th>Title</th></tr>${rows.map((d) => `<tr><td>${esc(d.id)}</td><td>${esc(d.domain)}</td><td>${esc(d.inventory?.n_items ?? "?")}</td><td>${esc(d.name)}</td></tr>`).join("")}</table>`;
 }
 function vDatasets() {
-  return `<div class="split"><div class="panel"><h2>Datasets</h2>${dsTable(S.datasets)}</div>
-  <form class="panel form-grid" data-form="dataset"><h2>Add dataset</h2>
-  <label>Name <input name="name" required></label>
-  <label>Domain <select name="domain"><option value="simulated">simulated</option><option value="real">real</option></select></label>
-  <label>Layout <select name="layout"><option value="class_folders">class folders</option><option value="csv">manifest.csv</option></select></label>
+  return `<div class="split"><div class="panel"><h2>Sound sets</h2>${dsTable(S.datasets)}</div>
+  <form class="panel form-grid" data-form="dataset"><h2>Add a set</h2>
+  <label>Title <input name="name" required></label>
+  <label>Kind <select name="domain"><option value="simulated">simulated</option><option value="real">real</option></select></label>
+  <label>Shape <select name="layout"><option value="class_folders">class folders</option><option value="csv">manifest.csv</option></select></label>
   <label>Folder <input name="root_path" required placeholder="C:\\recordings\\room-a"></label>
-  <label>Description <textarea name="description"></textarea></label>
-  <button class="primary" type="submit">Register</button></form></div>`;
+  <label>Notes <textarea name="description"></textarea></label>
+  <button class="primary" type="submit">Save set</button></form></div>`;
 }
 function modelOpts() { return S.models.map((m) => opt(m.id, `${m.id} — ${m.name}`)).join(""); }
 function dsOpts(domain) { return S.datasets.filter((d) => !domain || d.domain === domain).map((d) => opt(d.id, `${d.id} (${d.domain})`)).join(""); }
 function vEvaluate() {
-  return `<div class="split"><form class="panel form-grid" data-form="evaluate"><h2>Run evaluation</h2>
+  return `<div class="split"><form class="panel form-grid" data-form="evaluate"><h2>New test</h2>
   <label>Model <select name="model_id">${modelOpts()}</select></label>
-  <label>Mode <select name="mode"><option value="paired">Paired sim + real</option><option value="single">Single dataset</option></select></label>
-  <label>Dataset <select name="dataset_id">${dsOpts()}</select></label>
-  <label>Simulated <select name="sim_dataset_id">${dsOpts("simulated")}</select></label>
-  <label>Real <select name="real_dataset_id">${dsOpts("real")}</select></label>
+  <label>Style <select name="mode"><option value="paired">Paired sim + real</option><option value="single">One set only</option></select></label>
+  <label>Set <select name="dataset_id">${dsOpts()}</select></label>
+  <label>Synthetic <select name="sim_dataset_id">${dsOpts("simulated")}</select></label>
+  <label>Measured <select name="real_dataset_id">${dsOpts("real")}</select></label>
   <label>Rate <input name="sample_rate" type="number" value="16000"></label>
-  <label>Max seconds <input name="max_seconds" type="number" value="30" step="0.1"></label>
+  <label>Clip cap (s) <input name="max_seconds" type="number" value="30" step="0.1"></label>
   <label>Notes <textarea name="notes"></textarea></label>
-  <button class="primary" type="submit" ${S.busy ? "disabled" : ""}>Start</button></form>
-  <div class="panel"><h2>Models</h2><table><tr><th>ID</th><th>Name</th></tr>${S.models.map((m) => `<tr><td>${esc(m.id)}</td><td>${esc(m.name)}</td></tr>`).join("")}</table></div></div>`;
+  <button class="primary" type="submit" ${S.busy ? "disabled" : ""}>Launch</button></form>
+  <div class="panel"><h2>Models</h2><table><tr><th>ID</th><th>Title</th></tr>${S.models.map((m) => `<tr><td>${esc(m.id)}</td><td>${esc(m.name)}</td></tr>`).join("")}</table></div></div>`;
 }
 function vRuns() {
   const rows = S.runs.map((r) => `<tr><td><a href="#" data-action="pick" data-id="${esc(r.id)}">${esc(r.id)}</a></td><td>${esc(r.status)}</td><td>${esc(r.model_id)}</td><td>${esc(r.dataset_id)}</td></tr>`).join("");
-  return `<div class="panel"><h2>Runs</h2><table><tr><th>ID</th><th>Status</th><th>Model</th><th>Dataset</th></tr>${rows || `<tr><td colspan=4>No runs</td></tr>`}</table>
+  return `<div class="panel"><h2>Past runs</h2><table><tr><th>ID</th><th>State</th><th>Model</th><th>Set</th></tr>${rows || `<tr><td colspan=4>Nothing yet</td></tr>`}</table>
   ${S.detail ? `<h3>${esc(S.detail.id)}</h3><pre>${esc(JSON.stringify(S.detail.summary || {}, null, 2))}</pre>` : ""}</div>`;
 }
 function vCompare() {
-  return `<div class="panel"><h2>Compare</h2>
-  <form class="form-grid" data-form="compare"><label>Sim run <select name="sim">${S.runs.map((r) => opt(r.id, r.id)).join("")}</select></label>
-  <label>Real run <select name="real">${S.runs.map((r) => opt(r.id, r.id)).join("")}</select></label>
+  return `<div class="panel"><h2>Side by side</h2>
+  <form class="form-grid" data-form="compare"><label>Synthetic run <select name="sim">${S.runs.map((r) => opt(r.id, r.id)).join("")}</select></label>
+  <label>Measured run <select name="real">${S.runs.map((r) => opt(r.id, r.id)).join("")}</select></label>
   <button class="primary" type="submit">Compare</button></form>
-  ${S.comp ? `<pre>${esc(JSON.stringify(S.comp, null, 2))}</pre>` : `<p class="muted">Pick two completed runs.</p>`}</div>`;
+  ${S.comp ? `<pre>${esc(JSON.stringify(S.comp, null, 2))}</pre>` : `<p class="muted">Choose two finished runs.</p>`}</div>`;
 }
 function vBoard() {
-  return `<div class="panel"><h2>Leaderboard (best per task × dataset)</h2><pre>${esc(JSON.stringify(S.board, null, 2))}</pre></div>`;
+  return `<div class="panel"><h2>Standings (best per task × set)</h2><pre>${esc(JSON.stringify(S.board, null, 2))}</pre></div>`;
 }
 async function handle(el) {
   const a = el.dataset.action;
   if (a === "nav-evaluate") { go("evaluate"); return; }
-  if (a === "gen") { say("Building demo sets…"); await api("/api/examples/generate", { method: "POST" }).catch(() => api("/api/datasets", { method: "GET" })); say("Done."); go(S.view); return; }
-  if (a === "rooms") { say("Rooms need the CLI: echobench synth-rooms"); return; }
+  if (a === "gen") { say("Making practice sets…"); await api("/api/examples/generate", { method: "POST" }).catch(() => api("/api/datasets", { method: "GET" })); say("Done."); go(S.view); return; }
+  if (a === "rooms") { say("Rooms need the shell: echobench synth-rooms"); return; }
   if (a === "pick") { S.pick = el.dataset.id; S.detail = await api(`/api/runs/${S.pick}`); draw(); return; }
 }
 async function send(f) {
