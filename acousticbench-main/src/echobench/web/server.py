@@ -171,8 +171,8 @@ def _cfg(body: dict) -> dict:
         params = json.loads(params or "{}")
     out = {"sample_rate": body.get("sample_rate", 16000), "split": body.get("split", "all"),
            "max_items": body.get("max_items"), "max_seconds": body.get("max_seconds", 30),
-           "seed": body.get("seed", 11), "notes": body.get("notes", ""), "model_params": params,
-           "event_tolerance_s": body.get("event_tolerance_s", 0.25)}
+           "seed": body.get("seed", 17), "notes": body.get("notes", ""), "model_params": params,
+           "event_tolerance_s": body.get("event_tolerance_s", 0.22)}
     const_tag = (body.get("constant_tag") or body.get("constant_label") or "").strip()
     if const_tag:
         out["model_params"] = {**params, "tag": const_tag}
