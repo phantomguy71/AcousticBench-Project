@@ -98,7 +98,7 @@ def regress_metrics(truth: list[float], pred: list[float], lat=None, groups=None
     }
 
 
-def detect_metrics(truth_spans: list[list[tuple[float, float]]], pred_spans: list[list[tuple[float, float]]], tol: float = 0.25, lat=None) -> dict:
+def detect_metrics(truth_spans: list[list[tuple[float, float]]], pred_spans: list[list[tuple[float, float]]], tol: float = 0.22, lat=None) -> dict:
     """Onset-tolerant event scoring: a predicted span counts when its onset lands
     within `tol` seconds of an unmatched true onset with the same tag."""
     if len(truth_spans) != len(pred_spans):
