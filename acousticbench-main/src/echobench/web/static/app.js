@@ -72,7 +72,7 @@ function renderRunDetail(d) {
   ${byCondTable(s.by_condition)}${perClassTable(s.per_class)}${warnList(s.warnings)}
   <p class="muted">Model: ${esc((s.model_info && s.model_info.id) || d.model_id || "")} \u00b7 task ${esc(s.task || "")} \u00b7 isolation ${esc(s.isolation || "")}</p>
   <p><a href="/api/runs/${esc(d.id)}/report.md">Download markdown report</a></p>
-  <details><summary class="muted">Provenance + full JSON (debug)</summary><pre>${esc(JSON.stringify({summary: s, provenance: d.provenance || {}, config: d.config || {}}, null, 2).slice(0, 4000)}</pre></details>`;
+  <details><summary class="muted">Provenance + full JSON (debug)</summary><pre>${esc(JSON.stringify({summary: s, provenance: d.provenance || {}, config: d.config || {}}, null, 2).slice(0, 4000))}</pre></details>`;
 }
 function renderCompare(c) {
   if (!c) return '<p class="muted">Choose two runs on the left, then Compare.</p>';
