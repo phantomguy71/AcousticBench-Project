@@ -3,29 +3,36 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Acoustibcench</title>
+<title>AcousticBench Studio</title>
 <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
-<header class="top">
-  <div>
-    <p class="eyebrow">Malik Williams · Isaiah Tijero · Senior design</p>
-    <h1>Acoustibcench</h1>
-    <p class="tag">Reproducible sim-to-real benchmark for room-acoustic models</p>
+<div class="shell">
+<aside class="rail">
+  <div class="brand">
+    <p class="team">Malik Williams &middot; Isaiah Tijero &mdash; Senior Project</p>
+    <h1>AcousticBench <span>Studio</span></h1>
+    <p class="sub">Test room-sound models on synthetic + measured clips.</p>
   </div>
-  <nav>
-    <button data-view="overview">Overview</button>
-    <button data-view="datasets">Datasets</button>
-    <button data-view="evaluate">Evaluate</button>
-    <button data-view="runs">Runs</button>
-    <button data-view="compare">Compare</button>
-    <button data-view="board">Leaderboard</button>
+  <nav aria-label="Sections">
+    <button data-view="overview" class="rail-btn">Overview</button>
+    <button data-view="datasets" class="rail-btn">Datasets</button>
+    <button data-view="evaluate" class="rail-btn">Evaluate</button>
+    <button data-view="runs" class="rail-btn">Runs</button>
+    <button data-view="compare" class="rail-btn">Compare</button>
+    <button data-view="leaderboard" class="rail-btn">Leaderboard</button>
   </nav>
-</header>
-<p class="caveat">Demo audio is synthetic. Scores on it prove the harness runs; they are not study results.</p>
-<p class="flash" id="flash" role="status"></p>
-<main id="main"><p class="muted">Loading…</p></main>
-<footer><p>Team Malik Williams, Isaiah Tijero · Advisor Dr. Sambit Bhattacharya</p></footer>
+  <div class="rail-foot">
+    <p>Malik Williams &middot; Isaiah Tijero</p>
+    <p>Advisor: Dr. Sambit Bhattacharya</p>
+  </div>
+</aside>
+<div class="stage">
+  <p class="flash" id="flash" role="status"></p>
+  <main id="main"><p class="muted">Warming up&hellip;</p></main>
+  <footer><p>AcousticBench Studio &middot; local harness &middot; CSC 490-D1</p></footer>
+</div>
+</div>
 <script src="/static/app.js"></script>
 </body>
 </html>
