@@ -43,20 +43,66 @@ function draw() {
 }
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const opt = (v, t) => `<option value="${esc(v)}">${esc(t)}</option>`;
+const fmt = (v) => (v === null || v === undefined || (typeof v === "number" && isNaN(v)) ? "\u2014" : (typeof v === "number" ? (Math.abs(v) >= 100 ? v.toFixed(1) : v.toFixed(4)) : String(v)));
+function metricRows(s) {
+  const keys = ["accuracy","macro_f1","weighted_f1","macro_precision","macro_recall","event_f1","precision","recall","mae","rmse","median_ae","r2","ece","mean_latency_ms","p50_latency_ms","n_evaluated","n_errors"];
+  return keys.filter((k) => s[k] !== undefined && s[k] !== null).map((k) => `<tr><td>${esc(k)}</td><td>${fmt(s[k])}</td></tr>`).join("");
+}
+function byCondTable(by) {
+  if (!by || !Object.keys(by).length) return "";
+  const rows = Object.entries(by).map(([g, r]) => `<tr><td>${esc(g)}</td><td>${esc(r.n ?? "")}</td><td>${fmt(r.mae)}</td><td>${fmt(r.rmse)}</td></tr>`).join("");
+  return `<h3>By condition</h3><table><tr><th>Group</th><th>n</th><th>MAE</th><th>RMSE</th></tr>${rows}</table>`;
+}
+function perClassTable(pc) {
+  if (!pc || !Object.keys(pc).length) return "";
+  const rows = Object.entries(pc).map(([c, r]) => `<tr><td>${esc(c)}</td><td>${fmt(r.precision)}</td><td>${fmt(r.recall)}</td><td>${fmt(r.f1)}</td><td>${esc(r.support ?? "")}</td></tr>`).join("");
+  return `<h3>Per class</h3><table><tr><th>Class</th><th>P</th><th>R</th><th>F1</th><th>n</th></tr>${rows}</table>`;
+}
+function warnList(w) {
+  if (!w || !w.length) return "";
+  return `<h3>Warnings</h3><ul>${w.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>`;
+}
+function renderRunDetail(d) {
+  if (!d) return '<p class="muted">Select a run on the left.</p>';
+  if (d.status !== "completed") return `<h3>${esc(d.id)}</h3><p><b>Status:</b> ${esc(d.status)}</p>` + (d.error ? `<p style="color:#ff7a7a">${esc(d.error)}</p><p class="muted">Tip: T60/distance models need RIR sets (synth-rooms), not tone/noise demo sets.</p>` : "");
+  const s = d.summary || {};
+  return `<h3>${esc(d.id)}</h3>
+  <p><b>${esc(d.model_name || d.model_id || "")}</b> on <b>${esc(d.dataset_name || d.dataset_id || "")}</b> (${esc(d.dataset_domain || "")})</p>
+  <table><tr><th>Metric</th><th>Value</th></tr>${metricRows(s)}</table>
+  ${byCondTable(s.by_condition)}${perClassTable(s.per_class)}${warnList(s.warnings)}
+  <p class="muted">Model: ${esc((s.model_info && s.model_info.id) || d.model_id || "")} \u00b7 task ${esc(s.task || "")} \u00b7 isolation ${esc(s.isolation || "")}</p>
+  <p><a href="/api/runs/${esc(d.id)}/report.md">Download markdown report</a></p>
+  <details><summary class="muted">Provenance + full JSON (debug)</summary><pre>${esc(JSON.stringify({summary: s, provenance: d.provenance || {}, config: d.config || {}}, null, 2).slice(0, 4000)}</pre></details>`;
+}
+function renderCompare(c) {
+  if (!c) return '<p class="muted">Choose two runs on the left, then Compare.</p>';
+  const mrows = (c.metrics || []).map((m) => `<tr><td>${esc(m.label)}</td><td>${fmt(m.simulated)}</td><td>${fmt(m.real)}</td><td>${fmt(m.gap)}</td></tr>`).join("");
+  const prows = (c.per_class_f1 || []).map((r) => `<tr><td>${esc(r.label)}</td><td>${fmt(r.simulated_f1)}</td><td>${fmt(r.real_f1)}</td><td>${fmt(r.gap)}</td></tr>`).join("");
+  const boot = ((c.significance || {}).bootstrap) || {};
+  const warns = warnList(c.warnings);
+  return `<p class="muted">${esc(c.gap_definition || "gap = real \u2212 simulated")} \u00b7 task ${esc(c.task || "")}</p>
+  <table><tr><th>Metric</th><th>Sim</th><th>Real</th><th>Gap</th></tr>${mrows}</table>`
+  + (prows ? `<h3>Per-class F1</h3><table><tr><th>Class</th><th>Sim</th><th>Real</th><th>Gap</th></tr>${prows}</table>` : "")
+  + `<h3>Significance</h3><p>Bootstrap gap ${fmt(boot.gap)} [${fmt(boot.ci_low)}, ${fmt(boot.ci_high)}], ${esc(boot.rounds ?? 0)} resamples. Sign-test p: ${fmt(c.significance && c.significance.sign_p)}</p>` + warns;
+}
+function boardRows(b) {
+  const head = (s) => s.macro_f1 !== undefined && s.macro_f1 !== null ? "F1 " + fmt(s.macro_f1) : s.event_f1 !== undefined && s.event_f1 !== null ? "F1 " + fmt(s.event_f1) : s.mae !== undefined && s.mae !== null ? "MAE " + fmt(s.mae) : "";
+  return (b || []).map((r) => { const s = r.score || {}; return `<tr><td>${esc(r.task)}</td><td>${esc(r.dataset_id)}</td><td>${esc(r.run_id)}</td><td>${esc(r.model_id || "")}</td><td>${esc(head(s))}</td></tr>`; }).join("");
+}
 function vOverview() {
   const o = S.overview || {};
-  return `<div class="grid">
+  return `<div class="split"><div><div class="grid">
     <div class="card"><p class="muted">Datasets</p><p class="stat">${o.datasets ?? 0}</p></div>
     <div class="card"><p class="muted">Models</p><p class="stat">${o.models ?? 0}</p></div>
     <div class="card"><p class="muted">Runs</p><p class="stat">${o.runs ?? 0}</p></div>
-    <div class="card"><p class="muted">Tasks</p><p>${esc(o.tasks || "")}</p></div></div>
-    <div class="panel"><h2>How an evaluation flows</h2>
+    <div class="card"><p class="muted">Tasks</p><p>${esc(o.tasks || "")}</p></div></div></div>
+    <div class="panel" style="margin-top:0"><h2>How an evaluation flows</h2>
     <p>Pick one synthetic set and one measured set, run the same model on both, then open Compare. Each entry keeps its settings, clip outputs, and machine notes.</p>
     <p class="muted">${esc(o.gap || "")}</p>
     <div><button class="primary" data-action="nav-evaluate">Start a new evaluation</button>
     <button data-action="gen">Make demo sets</button>
     <button data-action="rooms">Make synthetic rooms</button></div></div>
-    <div class="panel"><h2>Recent slips</h2><pre>${esc(JSON.stringify(o.regressions || [], null, 2))}</pre></div>`;
+    <div class="panel"><h2>Recent slips</h2><pre>${esc(JSON.stringify(o.regressions || [], null, 2))}</pre></div></div>`;
 }
 function dsTable(rows) {
   if (!rows.length) return `<p class="muted">Nothing here yet. Make the practice sets first.</p>`;
@@ -89,18 +135,19 @@ function vEvaluate() {
 }
 function vRuns() {
   const rows = S.runs.map((r) => `<tr><td><a href="#" data-action="pick" data-id="${esc(r.id)}">${esc(r.id)}</a></td><td>${esc(r.status)}</td><td>${esc(r.model_id)}</td><td>${esc(r.dataset_id)}</td></tr>`).join("");
-  return `<div class="panel"><h2>Runs</h2><table><tr><th>ID</th><th>State</th><th>Model</th><th>Set</th></tr>${rows || `<tr><td colspan=4>Nothing yet</td></tr>`}</table>
-  ${S.detail ? `<h3>${esc(S.detail.id)}</h3><pre>${esc(JSON.stringify(S.detail.summary || {}, null, 2))}</pre>` : ""}</div>`;
+  return `<div class="split"><div class="panel" style="margin-top:0"><h2>Runs</h2><table><tr><th>ID</th><th>State</th><th>Model</th><th>Set</th></tr>${rows || `<tr><td colspan=4>Nothing yet</td></tr>`}</table><p class="muted">Click a run to inspect it on the side.</p></div>
+  <div class="panel" style="margin-top:0"><h2>Run detail</h2>
+  ${renderRunDetail(S.detail)}</div></div>`;
 }
 function vCompare() {
-  return `<div class="panel"><h2>Compare</h2>
+  return `<div class="split"><div class="panel" style="margin-top:0"><h2>Compare</h2>
   <form class="form-grid" data-form="compare"><label>Synthetic run <select name="sim">${S.runs.map((r) => opt(r.id, r.id)).join("")}</select></label>
   <label>Measured run <select name="real">${S.runs.map((r) => opt(r.id, r.id)).join("")}</select></label>
   <button class="primary" type="submit">Compare</button></form>
-  ${S.comp ? `<pre>${esc(JSON.stringify(S.comp, null, 2))}</pre>` : `<p class="muted">Choose two finished runs.</p>`}</div>`;
+  </div><div class="panel" style="margin-top:0"><h2>Result</h2>${renderCompare(S.comp)}</div></div>`;
 }
 function vLeaderboard() {
-  return `<div class="panel"><h2>Leaderboard (best per task \u00d7 set)</h2><pre>${esc(JSON.stringify(S.leaderboard, null, 2))}</pre></div>`;
+  return `<div class="split"><div class="panel" style="margin-top:0"><h2>Leaderboard (best per task \u00d7 set)</h2><table><tr><th>Task</th><th>Set</th><th>Run</th><th>Model</th><th>Score</th></tr>${boardRows(S.leaderboard)}</table></div><div class="panel" style="margin-top:0"><h2>How scoring works</h2><p>Higher F1 wins for room/classes/events. Lower MAE wins for t60/distance.</p><p class="muted">gap = real \u2212 simulated</p></div></div>`;
 }
 async function handle(el) {
   const a = el.dataset.action;
